@@ -7,88 +7,117 @@
 
 <style>
 body{
-margin:0;
-font-family:system-ui, Arial;
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-background:linear-gradient(135deg,#6a0dad,#b19cd9,#e0b3ff);
+  margin:0;
+  font-family:system-ui, Arial;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#6a0dad,#b19cd9,#e0b3ff);
 }
 
 .card{
-background:#fff;
-padding:42px;
-border-radius:24px;
-box-shadow:0 22px 60px rgba(0,0,0,.16);
-text-align:center;
-width:min(560px,92vw);
-overflow:hidden;
+  background:#fff;
+  padding:42px;
+  border-radius:24px;
+  box-shadow:0 22px 60px rgba(0,0,0,.16);
+  text-align:center;
+  width:min(560px,92vw);
+  overflow:hidden;
 }
 
 .stage{
-transition:opacity .8s ease, transform .8s ease;
-opacity:1;
-transform:translateY(0);
+  transition:opacity .8s ease, transform .8s ease;
+  opacity:1;
+  transform:translateY(0);
 }
 
 .stage.fade-out{
-opacity:0;
-transform:translateY(18px);
+  opacity:0;
+  transform:translateY(18px);
 }
 
 img{
-width:160px;
-border-radius:16px;
-margin:6px;
+  width:160px;
+  border-radius:16px;
+  margin:6px;
 }
 
 .photoRow{
-display:flex;
-justify-content:center;
-flex-wrap:wrap;
-margin-bottom:12px;
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-bottom:12px;
+}
+
+/* Button area so we can move NO around safely */
+.btnArea{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:10px;
+  min-height:70px; /* gives space when NO moves */
 }
 
 button{
-font-size:18px;
-padding:12px 20px;
-border:0;
-border-radius:14px;
-cursor:pointer;
-margin:6px;
+  font-size:18px;
+  padding:12px 20px;
+  border:0;
+  border-radius:14px;
+  cursor:pointer;
+  margin:6px;
+  transition: transform .25s ease;
 }
 
-#primary{background:#7b2cbf;color:white;}
-#secondary{background:#e9ecef;}
+/* YES always on top so it always clicks */
+#primary{
+  background:#7b2cbf;
+  color:white;
+  position:relative;
+  z-index:10;
+}
+
+/* NO is movable */
+#secondary{
+  background:#e9ecef;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:1;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 🎵 MUSIC ADDED (ONLY NEW HTML PART) -->
 <audio id="bgMusic" autoplay loop>
   <source src="headspace.mp3" type="audio/mpeg">
 </audio>
 
 <div class="card">
-<div id="stage" class="stage">
+  <div id="stage" class="stage">
 
-<div id="photos" class="photoRow"></div>
+    <div id="photos" class="photoRow"></div>
 
-<h1 id="title"></h1>
-<p id="text"></p>
+    <h1 id="title"></h1>
+    <p id="text"></p>
 
-<button id="primary"></button>
-<button id="secondary" style="display:none;"></button>
+    <div class="btnArea" id="btnArea">
+      <button id="primary"></button>
+      <button id="secondary" style="display:none;"></button>
+    </div>
 
-<div id="msg"></div>
+    <div id="msg"></div>
 
-</div>
+  </div>
 </div>
 
 <script>
 let step = 0;
+let noClicks = 0;
 
 const stage = document.getElementById("stage");
 const title = document.getElementById("title");
@@ -97,94 +126,138 @@ const primary = document.getElementById("primary");
 const secondary = document.getElementById("secondary");
 const msg = document.getElementById("msg");
 const photosDiv = document.getElementById("photos");
+const btnArea = document.getElementById("btnArea");
 
-/* 🎵 MUSIC ADDED (ONLY NEW JS PART) */
 const music = document.getElementById("bgMusic");
-
 document.addEventListener("click", () => {
   music.play().catch(()=>{});
 }, { once:true });
 
 const steps = [
-{ title:"AYANNA", text:"PRESS THIS BUTTON ASAP 😤", primary:"okie", secondary:null },
-{ title:"alright bruh.", text:"i needa ask you something 🤭", primary:"ok what", secondary:"back" },
-{ title:"hol up", text:"are you sure you want to know", primary:"yawp", secondary:"back" },
-{ title:"so like", text:"are you sure???? 🤔", primary:"yes dude", secondary:"back" },
-{ title:"likeee", text:"r u rly rly rly sure????", primary:"bro yes", secondary:"back" },
-{ title:"Ayanna Keely...", text:"Will you be my Valentine? 🙂🙂🙂🙂", primary:"YAS", secondary:"NO ew" }
+  { title:"AYANNA", text:"PRESS THIS BUTTON ASAP 😤", primary:"okie", secondary:null },
+  { title:"alright bruh.", text:"i needa ask you something 🤭", primary:"ok what", secondary:"back" },
+  { title:"hol up", text:"are you sure you want to know", primary:"yawp", secondary:"back" },
+  { title:"so like", text:"are you sure???? 🤔", primary:"yes dude", secondary:"back" },
+  { title:"likeee", text:"r u rly rly rly sure????", primary:"bro yes", secondary:"back" },
+  { title:"Ayanna Keely...", text:"Will you be my Valentine? 🙂🙂🙂🙂", primary:"YAS", secondary:"NO ew" }
 ];
 
 function renderPhotos(){
-photosDiv.innerHTML="";
+  photosDiv.innerHTML="";
+  let photoSet=[];
 
-let photoSet=[];
+  if(step===0) photoSet=["7.jpg"];
+  if(step===1) photoSet=["8.jpg","5.jpg"];
+  if(step===2) photoSet=["6.jpg"];
+  if(step===3) photoSet=["2.jpg","3.jpg"];
+  if(step===4) photoSet=["4.jpg"];
+  if(step===5) photoSet=["1.jpg","9.jpg"];
 
-if(step===0) photoSet=["7.jpg"];
-if(step===1) photoSet=["8.jpg","5.jpg"];
-if(step===2) photoSet=["6.jpg"];
-if(step===3) photoSet=["2.jpg","3.jpg"];
-if(step===4) photoSet=["4.jpg"];
-if(step===5) photoSet=["1.jpg", "9.jpg"];
+  photoSet.forEach(p=>{
+    let img=document.createElement("img");
+    img.src=p;
+    photosDiv.appendChild(img);
+  });
+}
 
-photoSet.forEach(p=>{
-let img=document.createElement("img");
-img.src=p;
-photosDiv.appendChild(img);
-});
+function placeNoButtonCenter(){
+  secondary.style.left = "50%";
+  secondary.style.top = "50%";
+  secondary.style.transform = "translate(-50%,-50%)";
+}
+
+function moveNoButtonRandom(){
+  // Keep NO inside the button area
+  const pad = 10;
+  const area = btnArea.getBoundingClientRect();
+  const btn = secondary.getBoundingClientRect();
+
+  const maxX = Math.max(pad, area.width - btn.width - pad);
+  const maxY = Math.max(pad, area.height - btn.height - pad);
+
+  const x = pad + Math.random() * (maxX - pad);
+  const y = pad + Math.random() * (maxY - pad);
+
+  secondary.style.left = `${x}px`;
+  secondary.style.top = `${y}px`;
+  secondary.style.transform = "translate(0,0)";
 }
 
 function render(){
-const s = steps[step];
+  const s = steps[step];
 
-title.textContent = s.title;
-text.textContent = s.text;
-primary.textContent = s.primary;
+  title.textContent = s.title;
+  text.textContent = s.text;
+  primary.textContent = s.primary;
 
-if(s.secondary){
-secondary.style.display="inline-block";
-secondary.textContent=s.secondary;
-}else{
-secondary.style.display="none";
-}
+  if(s.secondary){
+    secondary.style.display="inline-block";
+    secondary.textContent=s.secondary;
+  }else{
+    secondary.style.display="none";
+  }
 
-primary.disabled=false;
-secondary.disabled=false;
-msg.textContent="";
+  primary.disabled=false;
+  secondary.disabled=false;
+  msg.textContent="";
 
-renderPhotos();
+  renderPhotos();
+
+  // reset YES size & NO counter when step changes
+  primary.style.transform = "scale(1)";
+  noClicks = 0;
+
+  // When NOT on final step, keep NO not absolute (hide anyway if not needed)
+  if(step !== steps.length - 1){
+    placeNoButtonCenter();
+  } else {
+    // On final step, start NO centered so she can click it immediately
+    // BUT we keep it absolute so we can move it later
+    placeNoButtonCenter();
+  }
 }
 
 function transition(nextStep){
-stage.classList.add("fade-out");
-
-setTimeout(()=>{
-step = nextStep;
-render();
-stage.classList.remove("fade-out");
-},800);
+  stage.classList.add("fade-out");
+  setTimeout(()=>{
+    step = nextStep;
+    render();
+    stage.classList.remove("fade-out");
+  },800);
 }
 
 primary.onclick = ()=>{
-if(step < steps.length-1){
-transition(step+1);
-}else{
-msg.textContent="YESS I LOVE YOU AND I CANT WAIT TO SEE YOU ON SATURDAY HEHEHE 😛";
-primary.disabled=true;
-}
+  if(step < steps.length-1){
+    transition(step+1);
+  }else{
+    msg.textContent="YESS I LOVE YOU AND I CANT WAIT TO SEE YOU ON SATURDAY HEHEHE 😛";
+    primary.disabled=true;
+    secondary.disabled=true;
+  }
 };
 
 secondary.onclick = ()=>{
-if(step === steps.length-1){
-msg.textContent = "AW HELL NAH WE REDOING IT RN 🤨";
-transition(0);
-return;
-}
+  // FINAL SCREEN: NO makes YES bigger AND NO moves so it stays clickable
+  if(step === steps.length-1){
+    noClicks++;
 
-if(step > 0){
-transition(step-1);
-}else{
-msg.textContent="go refresh and do it again like wtf";
-}
+    msg.textContent = "nah try again 😌";
+
+    const scaleAmount = 1 + (noClicks * 0.35);
+    primary.style.transform = `scale(${scaleAmount})`;
+
+    // Move NO somewhere else so YES never blocks it
+    // Small timeout so it feels snappy & not “teleporty” mid-click
+    setTimeout(moveNoButtonRandom, 60);
+
+    return;
+  }
+
+  if(step > 0){
+    transition(step-1);
+  }else{
+    msg.textContent="go refresh and do it again like wtf";
+  }
 };
 
 render();
