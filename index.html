@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ayanna? 💌</title>
+
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui, Arial;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#ffd6e7,#ffeef5);
+    }
+    .card{
+      background:#fff;
+      padding:40px;
+      border-radius:22px;
+      box-shadow:0 20px 55px rgba(0,0,0,.15);
+      text-align:center;
+      width:min(520px,92vw);
+    }
+    h1{margin:0 0 10px;font-size:34px;}
+    p{margin:0 0 22px;font-size:18px;line-height:1.35;}
+    .buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+    button{
+      font-size:18px;
+      padding:12px 18px;
+      border:0;
+      border-radius:14px;
+      cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease;
+      user-select:none;
+    }
+    button:hover{transform:scale(1.04);}
+    #primary{background:#ff4d6d;color:white;}
+    #secondary{background:#e9ecef;}
+    #msg{margin-top:18px;font-size:20px;min-height:28px;}
+    .fade-in{animation:fade .25s ease;}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1 id="title" class="fade-in">Ayanna 💘</h1>
+    <p id="text" class="fade-in">Can you press this button for me?</p>
+
+    <div class="buttons">
+      <button id="primary">Yes?</button>
+      <button id="secondary" style="display:none;">Back</button>
+    </div>
+
+    <div id="msg"></div>
+  </div>
+
+  <script>
+    // Step-by-step flow:
+    // 0: "Ayanna" + "Yes?"
+    // 1: "I need to ask you something" + "Ok??"
+    // 2: "Will you be my Valentine?" + "Yes ❤️" + "No 😭"
+    let step = 0;
+
+    const titleEl = document.getElementById("title");
+    const textEl  = document.getElementById("text");
+    const msgEl   = document.getElementById("msg");
+    const primary = document.getElementById("primary");
+    const secondary = document.getElementById("secondary");
+
+    function setContent({ title, text, primaryLabel, secondaryLabel, showSecondary=false }) {
+      titleEl.textContent = title;
+      textEl.textContent = text;
+      primary.textContent = primaryLabel;
+
+      secondary.style.display = showSecondary ? "inline-block" : "none";
+      if (showSecondary) secondary.textContent = secondaryLabel || "Back";
+
+      // little animation refresh
+      titleEl.classList.remove("fade-in"); textEl.classList.remove("fade-in");
+      void titleEl.offsetWidth;
+      titleEl.classList.add("fade-in"); textEl.classList.add("fade-in");
+    }
+
+    function goToStep(n) {
+      step = n;
+      msgEl.textContent = "";
+
+      if (step === 0) {
+        document.title = "Ayanna? 💌";
+        setContent({
+          title: "Ayanna 💘",
+          text: "Can you press this button for me?",
+          primaryLabel: "Yes?",
+          showSecondary: false
+        });
+      }
+
+      if (step === 1) {
+        document.title = "One thing…";
+        setContent({
+          title: "Okay…",
+          text: "I need to ask you something 😅",
+          primaryLabel: "Ok??",
+          showSecondary: true,
+          secondaryLabel: "Back"
+        });
+      }
+
+      if (step === 2) {
+        document.title = "Valentine? ❤️";
+        setContent({
+          title: "Important Question 💖",
+          text: "Will you be my Valentine?",
+          primaryLabel: "Yes ❤️",
+          showSecondary: true,
+          secondaryLabel: "Not yet"
+        });
+      }
+    }
+
+    primary.addEventListener("click", () => {
+      if (step === 0) {
+        goToStep(1);
+        return;
+      }
+      if (step === 1) {
+        goToStep(2);
+        return;
+      }
+      if (step === 2) {
+        // Yes ❤️
+        msgEl.textContent = "YES I LOVE YOU and I can't wait to see you on Saturday!!! HEHEHEH";
+        primary.disabled = true;
+        secondary.disabled = true;
+        return;
+      }
+    });
+
+    // Secondary acts like "Back / Not yet / No"
+    secondary.addEventListener("click", () => {
+      if (step === 1) {
+        goToStep(0);
+        return;
+      }
+      if (step === 2) {
+        // "Not yet" (your version of a gentle no)
+        msgEl.textContent = "Okay  but you’re still my favorite person 💛";
+      }
+    });
+
+    // Start
+    goToStep(0);
+  </script>
+</body>
+</html>
