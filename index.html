@@ -66,6 +66,11 @@ margin:6px;
 
 <body>
 
+<!-- 🎵 MUSIC ADDED (ONLY NEW HTML PART) -->
+<audio id="bgMusic" autoplay loop>
+  <source src="headspace.mp3" type="audio/mpeg">
+</audio>
+
 <div class="card">
 <div id="stage" class="stage">
 
@@ -92,6 +97,13 @@ const primary = document.getElementById("primary");
 const secondary = document.getElementById("secondary");
 const msg = document.getElementById("msg");
 const photosDiv = document.getElementById("photos");
+
+/* 🎵 MUSIC ADDED (ONLY NEW JS PART) */
+const music = document.getElementById("bgMusic");
+
+document.addEventListener("click", () => {
+  music.play().catch(()=>{});
+}, { once:true });
 
 const steps = [
 { title:"AYANNA", text:"PRESS THIS BUTTON ASAP 😤", primary:"okie", secondary:null },
