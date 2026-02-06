@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Valentine?</title>
+  <style>
+    body { font-family: system-ui, Arial; display:flex; height:100vh; margin:0; align-items:center; justify-content:center; background:#fff0f6; }
+    .card { background:white; padding:32px; border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.12); text-align:center; max-width:420px; }
+    h1 { margin:0 0 10px; }
+    button { font-size:16px; padding:10px 16px; border:0; border-radius:12px; margin:8px; cursor:pointer; }
+    #yes { background:#ff4d6d; color:white; }
+    #no { background:#e9ecef; }
+    #msg { margin-top:14px; font-size:18px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>💘 Hey love 💘</h1>
+    <p>I have one very important question…</p>
+    <h2>Will you be my Valentine?</h2>
+    <button id="yes">Yes!</button>
+    <button id="no">No</button>
+    <div id="msg"></div>
+  </div>
 
+  <script>
+    const msg = document.getElementById("msg");
+    document.getElementById("yes").onclick = () => {
+      msg.textContent = "YAY!! 🥰🍫🌹 I can’t wait 💖";
+    };
+    document.getElementById("no").onclick = () => {
+      msg.textContent = "Okay 😭 but you’re still my favorite person 💛";
+    };
+  </script>
+</body>
+</html>
+</title>
+</head>
+<body>
+
+</body>
+</html>
