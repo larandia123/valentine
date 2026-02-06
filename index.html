@@ -1,159 +1,182 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ayanna? 💌</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ayanna? 💌</title>
 
-  <style>
-    body{
-      margin:0;
-      font-family:system-ui, Arial;
-      height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(135deg,#ffd6e7,#ffeef5);
-    }
-    .card{
-      background:#fff;
-      padding:40px;
-      border-radius:22px;
-      box-shadow:0 20px 55px rgba(0,0,0,.15);
-      text-align:center;
-      width:min(520px,92vw);
-    }
-    h1{margin:0 0 10px;font-size:34px;}
-    p{margin:0 0 22px;font-size:18px;line-height:1.35;}
-    .buttons{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
-    button{
-      font-size:18px;
-      padding:12px 18px;
-      border:0;
-      border-radius:14px;
-      cursor:pointer;
-      transition:transform .15s ease, opacity .15s ease;
-      user-select:none;
-    }
-    button:hover{transform:scale(1.04);}
-    #primary{background:#ff4d6d;color:white;}
-    #secondary{background:#e9ecef;}
-    #msg{margin-top:18px;font-size:20px;min-height:28px;}
-    .fade-in{animation:fade .25s ease;}
-    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-  </style>
+<style>
+body{
+margin:0;
+font-family:system-ui, Arial;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#6a0dad,#b19cd9,#e0b3ff);
+}
+
+.card{
+background:#fff;
+padding:42px;
+border-radius:24px;
+box-shadow:0 22px 60px rgba(0,0,0,.16);
+text-align:center;
+width:min(560px,92vw);
+overflow:hidden;
+}
+
+.stage{
+transition:opacity .8s ease, transform .8s ease;
+opacity:1;
+transform:translateY(0);
+}
+
+.stage.fade-out{
+opacity:0;
+transform:translateY(18px);
+}
+
+img{
+width:160px;
+border-radius:16px;
+margin:6px;
+}
+
+.photoRow{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+margin-bottom:12px;
+}
+
+button{
+font-size:18px;
+padding:12px 20px;
+border:0;
+border-radius:14px;
+cursor:pointer;
+margin:6px;
+}
+
+#primary{background:#7b2cbf;color:white;}
+#secondary{background:#e9ecef;}
+</style>
 </head>
 
 <body>
-  <div class="card">
-    <h1 id="title" class="fade-in">Ayanna 💘</h1>
-    <p id="text" class="fade-in">Can you press this button for me?</p>
 
-    <div class="buttons">
-      <button id="primary">Yes?</button>
-      <button id="secondary" style="display:none;">Back</button>
-    </div>
+<div class="card">
+<div id="stage" class="stage">
 
-    <div id="msg"></div>
-  </div>
+<div id="photos" class="photoRow"></div>
 
-  <script>
-    // Step-by-step flow:
-    // 0: "Ayanna" + "Yes?"
-    // 1: "I need to ask you something" + "Ok??"
-    // 2: "Will you be my Valentine?" + "Yes ❤️" + "No 😭"
-    let step = 0;
+<h1 id="title"></h1>
+<p id="text"></p>
 
-    const titleEl = document.getElementById("title");
-    const textEl  = document.getElementById("text");
-    const msgEl   = document.getElementById("msg");
-    const primary = document.getElementById("primary");
-    const secondary = document.getElementById("secondary");
+<button id="primary"></button>
+<button id="secondary" style="display:none;"></button>
 
-    function setContent({ title, text, primaryLabel, secondaryLabel, showSecondary=false }) {
-      titleEl.textContent = title;
-      textEl.textContent = text;
-      primary.textContent = primaryLabel;
+<div id="msg"></div>
 
-      secondary.style.display = showSecondary ? "inline-block" : "none";
-      if (showSecondary) secondary.textContent = secondaryLabel || "Back";
+</div>
+</div>
 
-      // little animation refresh
-      titleEl.classList.remove("fade-in"); textEl.classList.remove("fade-in");
-      void titleEl.offsetWidth;
-      titleEl.classList.add("fade-in"); textEl.classList.add("fade-in");
-    }
+<script>
+let step = 0;
 
-    function goToStep(n) {
-      step = n;
-      msgEl.textContent = "";
+const stage = document.getElementById("stage");
+const title = document.getElementById("title");
+const text = document.getElementById("text");
+const primary = document.getElementById("primary");
+const secondary = document.getElementById("secondary");
+const msg = document.getElementById("msg");
+const photosDiv = document.getElementById("photos");
 
-      if (step === 0) {
-        document.title = "Ayanna? 💌";
-        setContent({
-          title: "Ayanna 💘",
-          text: "Can you press this button for me?",
-          primaryLabel: "Yes?",
-          showSecondary: false
-        });
-      }
+const steps = [
+{ title:"AYANNA", text:"PRESS THIS BUTTON ASAP 😤", primary:"okie", secondary:null },
+{ title:"alright bruh.", text:"i needa ask you something 🤭", primary:"ok what", secondary:"back" },
+{ title:"hol up", text:"are you sure you want to know", primary:"yawp", secondary:"back" },
+{ title:"so like", text:"are you sure???? 🤔", primary:"yes dude", secondary:"back" },
+{ title:"likeee", text:"r u rly rly rly sure????", primary:"bro yes", secondary:"back" },
+{ title:"Ayanna Keely...", text:"Will you be my Valentine? 🙂🙂🙂🙂", primary:"YAS", secondary:"NO ew" }
+];
 
-      if (step === 1) {
-        document.title = "One thing…";
-        setContent({
-          title: "Okay…",
-          text: "I need to ask you something 😅",
-          primaryLabel: "Ok??",
-          showSecondary: true,
-          secondaryLabel: "Back"
-        });
-      }
+function renderPhotos(){
+photosDiv.innerHTML="";
 
-      if (step === 2) {
-        document.title = "Valentine? ❤️";
-        setContent({
-          title: "Important Question 💖",
-          text: "Will you be my Valentine?",
-          primaryLabel: "Yes ❤️",
-          showSecondary: true,
-          secondaryLabel: "Not yet"
-        });
-      }
-    }
+let photoSet=[];
 
-    primary.addEventListener("click", () => {
-      if (step === 0) {
-        goToStep(1);
-        return;
-      }
-      if (step === 1) {
-        goToStep(2);
-        return;
-      }
-      if (step === 2) {
-        // Yes ❤️
-        msgEl.textContent = "YES I LOVE YOU and I can't wait to see you on Saturday!!! HEHEHEH";
-        primary.disabled = true;
-        secondary.disabled = true;
-        return;
-      }
-    });
+if(step===0) photoSet=["7.jpg"];
+if(step===1) photoSet=["8.jpg","5.jpg"];
+if(step===2) photoSet=["6.jpg"];
+if(step===3) photoSet=["2.jpg","3.jpg"];
+if(step===4) photoSet=["4.jpg"];
+if(step===5) photoSet=["1.jpg", "9.jpg"];
 
-    // Secondary acts like "Back / Not yet / No"
-    secondary.addEventListener("click", () => {
-      if (step === 1) {
-        goToStep(0);
-        return;
-      }
-      if (step === 2) {
-        // "Not yet" (your version of a gentle no)
-        msgEl.textContent = "Okay  but you’re still my favorite person 💛";
-      }
-    });
+photoSet.forEach(p=>{
+let img=document.createElement("img");
+img.src=p;
+photosDiv.appendChild(img);
+});
+}
 
-    // Start
-    goToStep(0);
-  </script>
+function render(){
+const s = steps[step];
+
+title.textContent = s.title;
+text.textContent = s.text;
+primary.textContent = s.primary;
+
+if(s.secondary){
+secondary.style.display="inline-block";
+secondary.textContent=s.secondary;
+}else{
+secondary.style.display="none";
+}
+
+primary.disabled=false;
+secondary.disabled=false;
+msg.textContent="";
+
+renderPhotos();
+}
+
+function transition(nextStep){
+stage.classList.add("fade-out");
+
+setTimeout(()=>{
+step = nextStep;
+render();
+stage.classList.remove("fade-out");
+},800);
+}
+
+primary.onclick = ()=>{
+if(step < steps.length-1){
+transition(step+1);
+}else{
+msg.textContent="YESS I LOVE YOU AND I CANT WAIT TO SEE YOU ON SATURDAY HEHEHE 😛";
+primary.disabled=true;
+}
+};
+
+secondary.onclick = ()=>{
+if(step === steps.length-1){
+msg.textContent = "AW HELL NAH WE REDOING IT RN 🤨";
+transition(0);
+return;
+}
+
+if(step > 0){
+transition(step-1);
+}else{
+msg.textContent="go refresh and do it again like wtf";
+}
+};
+
+render();
+</script>
+
 </body>
 </html>
-
